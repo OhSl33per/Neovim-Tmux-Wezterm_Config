@@ -6,6 +6,16 @@ vim.cmd("set shiftwidth=2")
 vim.opt.number = true
 -- vim.opt.relativenumber = true
 
+local sysname = vim.uv.os_uname().sysname
+
+local is_mac = sysname == "Darwin"
+local is_linux = sysname == "Linux"
+local is_win = sysname == "Windows_NT"
+
+local is_wsl = vim.fn.has("wsl") == 1
+	or (is_linux and vim.fn.readfile("/proc/version")[1]:lower():find("microsoft") ~= nil)
+print("Source System:", sysname, " -- ", "Is WSL:", is_wsl)
+
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -73,6 +83,53 @@ require("lazy").setup({
 			dependencies = {
 				"nvim-lua/plenary.nvim",
 				{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+			},
+			config = function()
+				local actions = require("telescope.actions")
+				require("telescope").setup({
+					defaults = {
+						mappings = {
+							i = {
+								-- cycle through prompt history with C-n/C-p
+								["<C-n>"] = actions.cycle_history_next,
+								["<C-p>"] = actions.cycle_history_prev,
+								-- move selection with C-j/C-k instead
+								["<C-j>"] = actions.move_selection_next,
+								["<C-k>"] = actions.move_selection_previous,
+							},
+						},
+					},
+				})
+			end,
+			keys = {
+				{
+					"<C-p>",
+					function()
+						require("telescope.builtin").find_files()
+					end,
+					desc = "Find files",
+				},
+				{
+					"<leader>tl",
+					function()
+						require("telescope.builtin").live_grep()
+					end,
+					desc = "Live grep",
+				},
+				{
+					"<leader>gs",
+					function()
+						require("telescope.builtin").git_status()
+					end,
+					desc = "Git status (changed files)",
+				},
+				{
+					"<leader>tr",
+					function()
+						require("telescope.builtin").resume()
+					end,
+					desc = "Resume last search",
+				},
 			},
 		},
 
@@ -298,10 +355,18 @@ require("lazy").setup({
 							hide_dotfiles = false, -- show hidden files like .env, .gitignore
 							hide_gitignored = false,
 						},
+						follow_current_file = {
+							enabled = true, -- Focuses the active file in the tree automatically
+							leave_dirs_open = false, -- Closes collapsed directories when changing files (optional)
+						},
+						use_libuv_file_watcher = true, -- Automatically updates tree when files change on disk
 					},
 					reveal = true,
 				})
 			end,
+			keys = {
+				{ "<leader>e", ":Neotree filesystem reveal toggle<CR>", desc = "Toggle file explorer" },
+			},
 		},
 		{
 			"mbbill/undotree",
@@ -364,14 +429,134 @@ require("lazy").setup({
 					lsp_fallback = true,
 				},
 			},
+			keys = {
+				{ "<leader>cf", vim.lsp.buf.format, desc = "Format document" },
+			},
 		},
-		{ "mrjones2014/smart-splits.nvim", lazy = false },
+		{
+			"mrjones2014/smart-splits.nvim",
+			lazy = false,
+			keys = {
+				-- resizing splits
+				-- these keymaps will also accept a range,
+				-- for example `10<A-h>` will `resize_left` by `(10 * config.default_amount)`
+				{
+					"<A-h>",
+					function()
+						require("smart-splits").resize_left()
+					end,
+					desc = "Resize split left",
+				},
+				{
+					"<A-j>",
+					function()
+						require("smart-splits").resize_down()
+					end,
+					desc = "Resize split down",
+				},
+				{
+					"<A-k>",
+					function()
+						require("smart-splits").resize_up()
+					end,
+					desc = "Resize split up",
+				},
+				{
+					"<A-l>",
+					function()
+						require("smart-splits").resize_right()
+					end,
+					desc = "Resize split right",
+				},
+				-- moving between splits
+				{
+					"<C-h>",
+					function()
+						require("smart-splits").move_cursor_left()
+					end,
+					desc = "Move to split left",
+				},
+				{
+					"<C-j>",
+					function()
+						require("smart-splits").move_cursor_down()
+					end,
+					desc = "Move to split down",
+				},
+				{
+					"<C-k>",
+					function()
+						require("smart-splits").move_cursor_up()
+					end,
+					desc = "Move to split up",
+				},
+				{
+					"<C-l>",
+					function()
+						require("smart-splits").move_cursor_right()
+					end,
+					desc = "Move to split right",
+				},
+				{
+					"<C-\\>",
+					function()
+						require("smart-splits").move_cursor_previous()
+					end,
+					desc = "Move to previous split",
+				},
+				-- swapping buffers between windows
+				{
+					"<leader><leader>h",
+					function()
+						require("smart-splits").swap_buf_left()
+					end,
+					desc = "Swap buffer left",
+				},
+				{
+					"<leader><leader>j",
+					function()
+						require("smart-splits").swap_buf_down()
+					end,
+					desc = "Swap buffer down",
+				},
+				{
+					"<leader><leader>k",
+					function()
+						require("smart-splits").swap_buf_up()
+					end,
+					desc = "Swap buffer up",
+				},
+				{
+					"<leader><leader>l",
+					function()
+						require("smart-splits").swap_buf_right()
+					end,
+					desc = "Swap buffer right",
+				},
+			},
+		},
 		{
 			"kevinhwang91/nvim-ufo",
 			dependencies = "kevinhwang91/promise-async",
 			config = function()
 				require("ufo").setup()
 			end,
+			keys = {
+				{
+					"zR",
+					function()
+						require("ufo").openAllFolds()
+					end,
+					desc = "Open all folds",
+				},
+				{
+					"zM",
+					function()
+						require("ufo").closeAllFolds()
+					end,
+					desc = "Close all folds",
+				},
+			},
 		},
 		{
 			"luukvbaal/statuscol.nvim",
@@ -479,16 +664,9 @@ require("lazy").setup({
 		},
 		{
 			"pmizio/typescript-tools.nvim",
-			dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+			dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig", "hrsh7th/cmp-nvim-lsp" },
 
-			enabled = true, -- vim.g.has_node,
-
-			ft = {
-				"typescript",
-				"typescriptreact",
-				"javascript",
-				"javascriptreact",
-			},
+			lazy = false,
 
 			config = function(_, opts)
 				local api = require("typescript-tools.api")
@@ -564,7 +742,129 @@ require("lazy").setup({
 				end,
 			},
 		},
-	},
+		{
+			"sindrets/diffview.nvim",
+				dependencies = { "nvim-lua/plenary.nvim" },
+				cmd = { "DiffviewOpen", "DiffviewFileHistory" },
+				config = function()
+					require("diffview").setup({
+						hooks = {
+							view_opened = function()
+								-- Force all windows in the tab to enable diff mode and recalculate alignment
+								vim.cmd("windo diffthis")
+								vim.cmd("diffupdate")
+							end,
+							buf_win_enter = function()
+								-- Recalculate whenever switching files in the file panel
+								if vim.wo.diff then
+									vim.cmd("diffupdate")
+								end
+							end,
+						},
+					})
+				end,
+				keys = {
+					{ "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Git: Open Diffview" },
+					{ "<leader>gc", "<cmd>DiffviewClose<cr>", desc = "Git: Close Diffview" },
+					{ "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", desc = "Git: Current File History" },
+					{ "<leader>gH", "<cmd>DiffviewFileHistory<cr>", desc = "Git: Repo Branch History" },
+					{ "<leader>gu", "<cmd>diffupdate<cr>", desc = "Git: Force Diff Re-align" },
+					{ "<leader>gr", "<cmd>DiffviewRefresh<cr>", desc = "Git: Refresh Diffview" },
+				},
+			},
+			{
+				"ThePrimeagen/harpoon",
+				branch = "harpoon2",
+				dependencies = { "nvim-lua/plenary.nvim", "nvim-telescope/telescope.nvim" },
+				config = function()
+					local harpoon = require("harpoon")
+					harpoon:setup()
+
+					-- Custom telescope picker over the harpoon list
+					local function toggle_telescope(harpoon_files)
+						local finders = require("telescope.finders")
+						local conf = require("telescope.config").values
+						local file_paths = {}
+						for _, item in ipairs(harpoon_files.items) do
+							table.insert(file_paths, item.value)
+						end
+
+						require("telescope.pickers")
+							.new({}, {
+								prompt_title = "Harpoon",
+								finder = finders.new_table({
+									results = file_paths,
+								}),
+								previewer = conf.file_previewer({}),
+								sorter = conf.generic_sorter({}),
+							})
+							:find()
+					end
+
+					vim.keymap.set("n", "<leader>ha", function()
+						harpoon:list():add()
+					end, { desc = "Harpoon: Add file" })
+
+					vim.keymap.set("n", "<leader>hd", function()
+						harpoon:list():remove()
+					end, { desc = "Harpoon: Remove file" })
+
+					vim.keymap.set("n", "<leader>hc", function()
+						harpoon:list():clear()
+					end, { desc = "Harpoon: Clear list" })
+
+					vim.keymap.set("n", "<leader>he", function()
+						harpoon.ui:toggle_quick_menu(harpoon:list())
+					end, { desc = "Harpoon: Toggle quick menu" })
+
+					vim.keymap.set("n", "<leader>hh", function()
+						toggle_telescope(harpoon:list())
+					end, { desc = "Harpoon: Telescope picker" })
+
+					vim.keymap.set("n", "<leader>hp", function()
+						harpoon:list():prev()
+					end, { desc = "Harpoon: Prev file" })
+
+					vim.keymap.set("n", "<leader>hn", function()
+						harpoon:list():next()
+					end, { desc = "Harpoon: Next file" })
+
+					for i = 1, 4 do
+						vim.keymap.set("n", "<leader>h" .. i, function()
+							harpoon:list():select(i)
+						end, { desc = "Harpoon: Select file " .. i })
+					end
+				end,
+			},
+
+			{
+				"tpope/vim-fugitive",
+				keys = {
+					-- { "<leader>gfs", "<cmd>vert Git<cr>", desc = "Git: Source Control Panel" },
+					{
+						"<leader>gfs",
+						function()
+							-- Check if fugitive panel is currently open
+							for _, win in ipairs(vim.api.nvim_list_wins()) do
+								local buf = vim.api.nvim_win_get_buf(win)
+								if vim.bo[buf].filetype == "fugitive" then
+									vim.api.nvim_win_close(win, false)
+									return
+								end
+							end
+							-- If not open, launch it in a 40-column vertical split
+							vim.cmd("vert Git")
+
+							-- Explicitly set the width of the newly opened panel (e.g., 40 columns)
+							vim.api.nvim_win_set_width(0, 40)
+						end,
+						desc = "Git: Toggle Source Control Sidebar",
+					},
+					{ "<leader>gfp", "<cmd>Git push<cr>", desc = "Git: Push" },
+					{ "<leader>gfl", "<cmd>Git pull<cr>", desc = "Git: Pull" },
+				},
+			},
+		},
 	install = { colorscheme = { "carbonfox", "habamax" } },
 	checker = { enabled = true },
 })
@@ -599,12 +899,6 @@ vim.diagnostic.config({
 	},
 })
 
--- Telescope keybinds
-local builtin = require("telescope.builtin")
-vim.keymap.set("n", "<C-p>", builtin.find_files, { desc = "Find files" })
-vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Live grep" })
-vim.keymap.set("n", "<leader>gs", builtin.git_status, { desc = "Git status (changed files)" })
-
 -- Optional: disable arrow keys to force hjkl habit
 vim.keymap.set("n", "<Up>", "<Nop>", { desc = "Disable Up arrow" })
 vim.keymap.set("n", "<Down>", "<Nop>", { desc = "Disable Down arrow" })
@@ -612,31 +906,9 @@ vim.keymap.set("n", "<Left>", "<Nop>", { desc = "Disable Left arrow" })
 vim.keymap.set("n", "<Right>", "<Nop>", { desc = "Disable Right arrow" })
 
 vim.keymap.set("n", "<Esc>", ":nohlsearch<CR>", { desc = "Clear search highlights" })
-vim.keymap.set("n", "<leader>e", ":Neotree filesystem reveal toggle<CR>", { desc = "Toggle file explorer" })
-
--- Smart Splits Keymaps
--- resizing splits
--- these keymaps will also accept a range,
--- for example `10<A-h>` will `resize_left` by `(10 * config.default_amount)`
-vim.keymap.set("n", "<A-h>", require("smart-splits").resize_left, { desc = "Resize split left" })
-vim.keymap.set("n", "<A-j>", require("smart-splits").resize_down, { desc = "Resize split down" })
-vim.keymap.set("n", "<A-k>", require("smart-splits").resize_up, { desc = "Resize split up" })
-vim.keymap.set("n", "<A-l>", require("smart-splits").resize_right, { desc = "Resize split right" })
--- moving between splits
-vim.keymap.set("n", "<C-h>", require("smart-splits").move_cursor_left, { desc = "Move to split left" })
-vim.keymap.set("n", "<C-j>", require("smart-splits").move_cursor_down, { desc = "Move to split down" })
-vim.keymap.set("n", "<C-k>", require("smart-splits").move_cursor_up, { desc = "Move to split up" })
-vim.keymap.set("n", "<C-l>", require("smart-splits").move_cursor_right, { desc = "Move to split right" })
-vim.keymap.set("n", "<C-\\>", require("smart-splits").move_cursor_previous, { desc = "Move to previous split" })
--- swapping buffers between windows
-vim.keymap.set("n", "<leader><leader>h", require("smart-splits").swap_buf_left, { desc = "Swap buffer left" })
-vim.keymap.set("n", "<leader><leader>j", require("smart-splits").swap_buf_down, { desc = "Swap buffer down" })
-vim.keymap.set("n", "<leader><leader>k", require("smart-splits").swap_buf_up, { desc = "Swap buffer up" })
-vim.keymap.set("n", "<leader><leader>l", require("smart-splits").swap_buf_right, { desc = "Swap buffer right" })
 
 -- Copy to system clipboard
 vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { desc = "Yank to clipboard" })
-
 -- Paste from system clipboard
 vim.keymap.set({ "n", "v" }, "<leader>p", '"+p', { desc = "Paste from clipboard" })
 
@@ -645,28 +917,32 @@ vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 99
 vim.opt.foldenable = true
 
-vim.keymap.set("n", "<leader>cf", vim.lsp.buf.format, { desc = "Format document" })
-
-vim.keymap.set("n", "zR", require("ufo").openAllFolds, { desc = "Open all folds" })
-vim.keymap.set("n", "zM", require("ufo").closeAllFolds, { desc = "Close all folds" })
+vim.opt.diffopt:append({
+	"algorithm:histogram", -- Improves diff accuracy
+	"indent-heuristic", -- Keeps code context aligned
+	"vertical", -- Forces vertical splits
+	"linematch:60", -- Better line-by-line alignment
+})
 
 vim.keymap.set("n", "<leader>xc", ":cclose<CR>", { desc = "Close quickfix" })
 
 vim.keymap.set("n", "<C-j>", "10j", { desc = "Jump down 10 lines" })
 vim.keymap.set("n", "<C-k>", "10k", { desc = "Jump up 10 lines" })
 
-vim.g.clipboard = {
-	name = "WslClipboard",
-	copy = {
-		["+"] = "clip.exe",
-		["*"] = "clip.exe",
-	},
-	paste = {
-		["+"] = 'powershell.exe -NoLogo -NoProfile -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
-		["*"] = 'powershell.exe -NoLogo -NoProfile -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
-	},
-	cache_enabled = 0,
-}
+if is_wsl == true then
+	vim.g.clipboard = {
+		name = "WslClipboard",
+		copy = {
+			["+"] = "clip.exe",
+			["*"] = "clip.exe",
+		},
+		paste = {
+			["+"] = 'powershell.exe -NoLogo -NoProfile -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+			["*"] = 'powershell.exe -NoLogo -NoProfile -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+		},
+		cache_enabled = 0,
+	}
+end
 
 local function load_grep_matches_to_buffer(pattern, root)
 	root = root or vim.loop.cwd()
