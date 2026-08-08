@@ -9,6 +9,7 @@ Personal dotfiles repository for `~/.config` on this WSL (Ubuntu 24.04) machine.
 | `nvim/init.lua` | Neovim configuration |
 | `nvim/lazy-lock.json` | Plugin lockfile for `lazy.nvim` |
 | `tmux/tmux.conf` | tmux configuration |
+| `tmux/plugins/*` | contains all plugins for `tmux`
 | `westerm-COPY/wezterm.lua` | WezTerm terminal configuration |
 | `wslu/baseexec`, `wslu/oemcp`, `wslu/triggered_time` | WSL utilities (`wslu`) state files |
 
@@ -19,8 +20,7 @@ local credentials/session state rather than shareable config:
 
 - `gh/` — GitHub CLI config and auth (`config.yml`, `hosts.yml`)
 - `github-copilot/` — GitHub Copilot CLI auth database and session data
-
-`CopilotChat/` also exists locally but is currently empty and untracked.
+- `bob/` - Bob neovim version manager as each os can get this separately
 
 ## Usage
 
