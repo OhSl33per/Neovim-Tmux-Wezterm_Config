@@ -21,13 +21,23 @@ if is_linux then
 end
 
 -- Shell & Auto-Launch tmux
-if is_wsl then
-  config.default_prog = { "wsl.exe", "bash", "-c", "cd ~ && tmux new-session" }
+if is_windows then
+  local has_wsl = false
+  local ok, _, _ = wezterm.run_child_process({ "wsl.exe", "-l", "-q" })
+  if ok then
+    has_wsl = true
+  end
+
+  if has_wsl then
+    config.default_prog = { "wsl.exe", "bash", "-c", "cd ~ && tmux new-session" }
+  end
 end
 
 if is_mac then
   config.default_prog = { "/bin/zsh", "-l", "-c", "/opt/homebrew/bin/tmux new-session" }
 end
+
+print(is_windows)
 
 -- Appearance
 config.color_scheme = "cyberpunk"

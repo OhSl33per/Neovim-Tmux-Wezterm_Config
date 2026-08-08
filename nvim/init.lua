@@ -3,6 +3,9 @@ vim.cmd("set tabstop=2")
 vim.cmd("set softtabstop=2")
 vim.cmd("set shiftwidth=2")
 
+-- Auto-recover swap files silently and delete the swap after recovery
+vim.opt.swapfile = false
+
 vim.opt.number = true
 -- vim.opt.relativenumber = true
 
@@ -15,6 +18,8 @@ local is_win = sysname == "Windows_NT"
 local is_wsl = vim.fn.has("wsl") == 1
 	or (is_linux and vim.fn.readfile("/proc/version")[1]:lower():find("microsoft") ~= nil)
 print("Source System:", sysname, " -- ", "Is WSL:", is_wsl)
+local v = vim.version()
+print(string.format("Neovim %d.%d.%d", v.major, v.minor, v.patch))
 
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -184,6 +189,8 @@ require("lazy").setup({
 						"css",
 						"python",
 						"c_sharp",
+						"markdown",
+						"markdown_inline",
 					},
 					auto_install = false,
 					highlight = { enable = true },
@@ -707,6 +714,8 @@ require("lazy").setup({
 					-- { desc = "Toggle Inlay Hints", silent = true, buffer = bufNr }
 					-- )
 
+					vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover documentation", silent = true, buffer = bufNr })
+
 					vim.keymap.set(
 						{ "n", "v" },
 						"<leader>io",
@@ -883,14 +892,7 @@ vim.diagnostic.config({
 		source = "if_many",
 		spacing = 2,
 	},
-	signs = {
-		text = {
-			[vim.diagnostic.severity.ERROR] = "█",
-			[vim.diagnostic.severity.WARN] = "█",
-			[vim.diagnostic.severity.INFO] = "█",
-			[vim.diagnostic.severity.HINT] = "█",
-		},
-	},
+	signs = false,
 	underline = true,
 	severity_sort = true,
 	float = {
@@ -898,6 +900,16 @@ vim.diagnostic.config({
 		source = "if_many",
 	},
 })
+
+-- Diagnostic highlight colors
+vim.api.nvim_set_hl(0, "DiagnosticVirtualTextError", { fg = "#ff1500", italic = true })
+vim.api.nvim_set_hl(0, "DiagnosticVirtualTextWarn",  { fg = "#ff7700", italic = true })
+vim.api.nvim_set_hl(0, "DiagnosticVirtualTextInfo",  { fg = "#02cae0", italic = true })
+vim.api.nvim_set_hl(0, "DiagnosticVirtualTextHint",  { fg = "#e002d9", italic = true })
+vim.api.nvim_set_hl(0, "DiagnosticSignError",        { fg = "#ff1500" })
+vim.api.nvim_set_hl(0, "DiagnosticSignWarn",         { fg = "#ff7700" })
+vim.api.nvim_set_hl(0, "DiagnosticSignInfo",         { fg = "#02cae0" })
+vim.api.nvim_set_hl(0, "DiagnosticSignHint",         { fg = "#e002d9" })
 
 -- Optional: disable arrow keys to force hjkl habit
 vim.keymap.set("n", "<Up>", "<Nop>", { desc = "Disable Up arrow" })
