@@ -255,7 +255,7 @@ require("lazy").setup({
 						map("gD", vim.lsp.buf.type_definition, "Go to type definition")
 						-- map("gr", vim.lsp.buf.references, "Find references")
 						map("gI", vim.lsp.buf.implementation, "Go to implementation")
-						map("K", vim.lsp.buf.hover, "Hover documentation")
+						map("gh", vim.lsp.buf.hover, "Go Hover documentation")
 						map("<leader>rn", vim.lsp.buf.rename, "Rename symbol")
 						map("<leader>ca", vim.lsp.buf.code_action, "Code action")
 						map("<leader>cd", vim.diagnostic.open_float, "Show diagnostic")
@@ -938,8 +938,13 @@ vim.opt.diffopt:append({
 
 vim.keymap.set("n", "<leader>xc", ":cclose<CR>", { desc = "Close quickfix" })
 
-vim.keymap.set("n", "<C-j>", "10j", { desc = "Jump down 10 lines" })
-vim.keymap.set("n", "<C-k>", "10k", { desc = "Jump up 10 lines" })
+vim.keymap.set({'n', 'v'}, '<Leader>j', 'J', { noremap = true, silent = true, desc = "Join Lines" })
+
+local opts = { noremap = true, silent = true }
+vim.keymap.set({"n", "v"}, "J", "10j", { desc = "Jump down 10 lines" }, opts)
+vim.keymap.set({"n", "v"}, "K", "10k", { desc = "Jump up 10 lines" }, opts)
+vim.keymap.set({"n", "v"}, "H", "10h", { desc = "Jump left 10 chars" }, opts)
+vim.keymap.set({"n", "v"}, "L", "10l", { desc = "Jump right 10 chars" }, opts)
 
 if is_wsl == true then
 	vim.g.clipboard = {

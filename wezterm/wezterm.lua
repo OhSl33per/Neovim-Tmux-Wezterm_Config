@@ -29,7 +29,7 @@ if is_windows then
   end
 
   if has_wsl then
-    config.default_prog = { "wsl.exe", "bash", "-c", "cd ~ && tmux new-session" }
+    config.default_prog = { "wsl.exe", "zsh", "-c", "cd ~ && tmux new-session" }
   end
 end
 
