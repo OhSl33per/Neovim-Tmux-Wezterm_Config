@@ -714,7 +714,12 @@ require("lazy").setup({
 					-- { desc = "Toggle Inlay Hints", silent = true, buffer = bufNr }
 					-- )
 
-					vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover documentation", silent = true, buffer = bufNr })
+					-- vim.keymap.set(
+					-- 	"n",
+					-- 	"K",
+					-- 	vim.lsp.buf.hover,
+					-- 	{ desc = "Hover documentation", silent = true, buffer = bufNr }
+					-- )
 
 					vim.keymap.set(
 						{ "n", "v" },
@@ -753,127 +758,130 @@ require("lazy").setup({
 		},
 		{
 			"sindrets/diffview.nvim",
-				dependencies = { "nvim-lua/plenary.nvim" },
-				cmd = { "DiffviewOpen", "DiffviewFileHistory" },
-				config = function()
-					require("diffview").setup({
-						hooks = {
-							view_opened = function()
-								-- Force all windows in the tab to enable diff mode and recalculate alignment
-								vim.cmd("windo diffthis")
-								vim.cmd("diffupdate")
-							end,
-							buf_win_enter = function()
-								-- Recalculate whenever switching files in the file panel
-								if vim.wo.diff then
-									vim.cmd("diffupdate")
-								end
-							end,
-						},
-					})
-				end,
-				keys = {
-					{ "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Git: Open Diffview" },
-					{ "<leader>gc", "<cmd>DiffviewClose<cr>", desc = "Git: Close Diffview" },
-					{ "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", desc = "Git: Current File History" },
-					{ "<leader>gH", "<cmd>DiffviewFileHistory<cr>", desc = "Git: Repo Branch History" },
-					{ "<leader>gu", "<cmd>diffupdate<cr>", desc = "Git: Force Diff Re-align" },
-					{ "<leader>gr", "<cmd>DiffviewRefresh<cr>", desc = "Git: Refresh Diffview" },
-				},
-			},
-			{
-				"ThePrimeagen/harpoon",
-				branch = "harpoon2",
-				dependencies = { "nvim-lua/plenary.nvim", "nvim-telescope/telescope.nvim" },
-				config = function()
-					local harpoon = require("harpoon")
-					harpoon:setup()
-
-					-- Custom telescope picker over the harpoon list
-					local function toggle_telescope(harpoon_files)
-						local finders = require("telescope.finders")
-						local conf = require("telescope.config").values
-						local file_paths = {}
-						for _, item in ipairs(harpoon_files.items) do
-							table.insert(file_paths, item.value)
-						end
-
-						require("telescope.pickers")
-							.new({}, {
-								prompt_title = "Harpoon",
-								finder = finders.new_table({
-									results = file_paths,
-								}),
-								previewer = conf.file_previewer({}),
-								sorter = conf.generic_sorter({}),
-							})
-							:find()
-					end
-
-					vim.keymap.set("n", "<leader>ha", function()
-						harpoon:list():add()
-					end, { desc = "Harpoon: Add file" })
-
-					vim.keymap.set("n", "<leader>hd", function()
-						harpoon:list():remove()
-					end, { desc = "Harpoon: Remove file" })
-
-					vim.keymap.set("n", "<leader>hc", function()
-						harpoon:list():clear()
-					end, { desc = "Harpoon: Clear list" })
-
-					vim.keymap.set("n", "<leader>he", function()
-						harpoon.ui:toggle_quick_menu(harpoon:list())
-					end, { desc = "Harpoon: Toggle quick menu" })
-
-					vim.keymap.set("n", "<leader>hh", function()
-						toggle_telescope(harpoon:list())
-					end, { desc = "Harpoon: Telescope picker" })
-
-					vim.keymap.set("n", "<leader>hp", function()
-						harpoon:list():prev()
-					end, { desc = "Harpoon: Prev file" })
-
-					vim.keymap.set("n", "<leader>hn", function()
-						harpoon:list():next()
-					end, { desc = "Harpoon: Next file" })
-
-					for i = 1, 4 do
-						vim.keymap.set("n", "<leader>h" .. i, function()
-							harpoon:list():select(i)
-						end, { desc = "Harpoon: Select file " .. i })
-					end
-				end,
-			},
-
-			{
-				"tpope/vim-fugitive",
-				keys = {
-					-- { "<leader>gfs", "<cmd>vert Git<cr>", desc = "Git: Source Control Panel" },
-					{
-						"<leader>gfs",
-						function()
-							-- Check if fugitive panel is currently open
-							for _, win in ipairs(vim.api.nvim_list_wins()) do
-								local buf = vim.api.nvim_win_get_buf(win)
-								if vim.bo[buf].filetype == "fugitive" then
-									vim.api.nvim_win_close(win, false)
-									return
-								end
-							end
-							-- If not open, launch it in a 40-column vertical split
-							vim.cmd("vert Git")
-
-							-- Explicitly set the width of the newly opened panel (e.g., 40 columns)
-							vim.api.nvim_win_set_width(0, 40)
+			dependencies = { "nvim-lua/plenary.nvim" },
+			cmd = { "DiffviewOpen", "DiffviewFileHistory" },
+			config = function()
+				require("diffview").setup({
+					hooks = {
+						view_opened = function()
+							-- Force all windows in the tab to enable diff mode and recalculate alignment
+							vim.cmd("windo diffthis")
+							vim.cmd("diffupdate")
 						end,
-						desc = "Git: Toggle Source Control Sidebar",
+						buf_win_enter = function()
+							-- Recalculate whenever switching files in the file panel
+							if vim.wo.diff then
+								vim.cmd("diffupdate")
+							end
+						end,
 					},
-					{ "<leader>gfp", "<cmd>Git push<cr>", desc = "Git: Push" },
-					{ "<leader>gfl", "<cmd>Git pull<cr>", desc = "Git: Pull" },
-				},
+				})
+			end,
+			keys = {
+				{ "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Git: Open Diffview" },
+				{ "<leader>gc", "<cmd>DiffviewClose<cr>", desc = "Git: Close Diffview" },
+				{ "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", desc = "Git: Current File History" },
+				{ "<leader>gH", "<cmd>DiffviewFileHistory<cr>", desc = "Git: Repo Branch History" },
+				{ "<leader>gu", "<cmd>diffupdate<cr>", desc = "Git: Force Diff Re-align" },
+				{ "<leader>gr", "<cmd>DiffviewRefresh<cr>", desc = "Git: Refresh Diffview" },
 			},
 		},
+		{
+			"ThePrimeagen/harpoon",
+			branch = "harpoon2",
+			dependencies = { "nvim-lua/plenary.nvim", "nvim-telescope/telescope.nvim" },
+			config = function()
+				local harpoon = require("harpoon")
+				harpoon:setup()
+
+				-- Custom telescope picker over the harpoon list
+				local function toggle_telescope(harpoon_files)
+					local finders = require("telescope.finders")
+					local conf = require("telescope.config").values
+					local file_paths = {}
+					for _, item in ipairs(harpoon_files.items) do
+						table.insert(file_paths, item.value)
+					end
+
+					require("telescope.pickers")
+						.new({}, {
+							prompt_title = "Harpoon",
+							finder = finders.new_table({
+								results = file_paths,
+							}),
+							previewer = conf.file_previewer({}),
+							sorter = conf.generic_sorter({}),
+						})
+						:find()
+				end
+
+				vim.keymap.set("n", "<leader>ha", function()
+					harpoon:list():add()
+				end, { desc = "Harpoon: Add file" })
+
+				vim.keymap.set("n", "<leader>hd", function()
+					harpoon:list():remove()
+				end, { desc = "Harpoon: Remove file" })
+
+				vim.keymap.set("n", "<leader>hc", function()
+					harpoon:list():clear()
+				end, { desc = "Harpoon: Clear list" })
+
+				vim.keymap.set("n", "<leader>he", function()
+					harpoon.ui:toggle_quick_menu(harpoon:list())
+				end, { desc = "Harpoon: Toggle quick menu" })
+
+				vim.keymap.set("n", "<leader>hh", function()
+					toggle_telescope(harpoon:list())
+				end, { desc = "Harpoon: Telescope picker" })
+
+				vim.keymap.set("n", "<leader>hp", function()
+					harpoon:list():prev()
+				end, { desc = "Harpoon: Prev file" })
+
+				vim.keymap.set("n", "<leader>hn", function()
+					harpoon:list():next()
+				end, { desc = "Harpoon: Next file" })
+
+				for i = 1, 4 do
+					vim.keymap.set("n", "<leader>h" .. i, function()
+						harpoon:list():select(i)
+					end, { desc = "Harpoon: Select file " .. i })
+				end
+			end,
+		},
+
+		{
+			"tpope/vim-fugitive",
+			keys = {
+				-- { "<leader>gfs", "<cmd>vert Git<cr>", desc = "Git: Source Control Panel" },
+				{
+					"<leader>gfs",
+					function()
+						-- Check if fugitive panel is currently open
+						for _, win in ipairs(vim.api.nvim_list_wins()) do
+							local buf = vim.api.nvim_win_get_buf(win)
+							if vim.bo[buf].filetype == "fugitive" then
+								vim.api.nvim_win_close(win, false)
+								return
+							end
+						end
+						-- If not open, launch it in a 40-column vertical split
+						vim.cmd("vert Git")
+
+						-- Explicitly set the width of the newly opened panel (e.g., 40 columns)
+						vim.api.nvim_win_set_width(0, 40)
+					end,
+					desc = "Git: Toggle Source Control Sidebar",
+				},
+				{ "<leader>gfp", "<cmd>Git push<cr>", desc = "Git: Push" },
+				{ "<leader>gfl", "<cmd>Git pull<cr>", desc = "Git: Pull" },
+			},
+		},
+		{
+			"lewis6991/satellite.nvim",
+		},
+	},
 	install = { colorscheme = { "carbonfox", "habamax" } },
 	checker = { enabled = true },
 })
@@ -903,13 +911,13 @@ vim.diagnostic.config({
 
 -- Diagnostic highlight colors
 vim.api.nvim_set_hl(0, "DiagnosticVirtualTextError", { fg = "#ff1500", italic = true })
-vim.api.nvim_set_hl(0, "DiagnosticVirtualTextWarn",  { fg = "#ff7700", italic = true })
-vim.api.nvim_set_hl(0, "DiagnosticVirtualTextInfo",  { fg = "#02cae0", italic = true })
-vim.api.nvim_set_hl(0, "DiagnosticVirtualTextHint",  { fg = "#e002d9", italic = true })
-vim.api.nvim_set_hl(0, "DiagnosticSignError",        { fg = "#ff1500" })
-vim.api.nvim_set_hl(0, "DiagnosticSignWarn",         { fg = "#ff7700" })
-vim.api.nvim_set_hl(0, "DiagnosticSignInfo",         { fg = "#02cae0" })
-vim.api.nvim_set_hl(0, "DiagnosticSignHint",         { fg = "#e002d9" })
+vim.api.nvim_set_hl(0, "DiagnosticVirtualTextWarn", { fg = "#ff7700", italic = true })
+vim.api.nvim_set_hl(0, "DiagnosticVirtualTextInfo", { fg = "#02cae0", italic = true })
+vim.api.nvim_set_hl(0, "DiagnosticVirtualTextHint", { fg = "#e002d9", italic = true })
+vim.api.nvim_set_hl(0, "DiagnosticSignError", { fg = "#ff1500" })
+vim.api.nvim_set_hl(0, "DiagnosticSignWarn", { fg = "#ff7700" })
+vim.api.nvim_set_hl(0, "DiagnosticSignInfo", { fg = "#02cae0" })
+vim.api.nvim_set_hl(0, "DiagnosticSignHint", { fg = "#e002d9" })
 
 -- Optional: disable arrow keys to force hjkl habit
 vim.keymap.set("n", "<Up>", "<Nop>", { desc = "Disable Up arrow" })
@@ -938,13 +946,13 @@ vim.opt.diffopt:append({
 
 vim.keymap.set("n", "<leader>xc", ":cclose<CR>", { desc = "Close quickfix" })
 
-vim.keymap.set({'n', 'v'}, '<Leader>j', 'J', { noremap = true, silent = true, desc = "Join Lines" })
+vim.keymap.set({ "n", "v" }, "<Leader>j", "J", { noremap = true, silent = true, desc = "Join Lines" })
 
 local opts = { noremap = true, silent = true }
-vim.keymap.set({"n", "v"}, "J", "10j", { desc = "Jump down 10 lines" }, opts)
-vim.keymap.set({"n", "v"}, "K", "10k", { desc = "Jump up 10 lines" }, opts)
-vim.keymap.set({"n", "v"}, "H", "10h", { desc = "Jump left 10 chars" }, opts)
-vim.keymap.set({"n", "v"}, "L", "10l", { desc = "Jump right 10 chars" }, opts)
+vim.keymap.set({ "n", "v" }, "J", "10j", { desc = "Jump down 10 lines" }, opts)
+vim.keymap.set({ "n", "v" }, "K", "10k", { desc = "Jump up 10 lines" }, opts)
+vim.keymap.set({ "n", "v" }, "H", "10h", { desc = "Jump left 10 chars" }, opts)
+vim.keymap.set({ "n", "v" }, "L", "10l", { desc = "Jump right 10 chars" }, opts)
 
 if is_wsl == true then
 	vim.g.clipboard = {
