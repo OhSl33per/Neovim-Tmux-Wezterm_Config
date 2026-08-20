@@ -98,6 +98,17 @@ vim.keymap.set("n", "<Down>", "<Nop>", { desc = "Disable Down arrow" })
 vim.keymap.set("n", "<Left>", "<Nop>", { desc = "Disable Left arrow" })
 vim.keymap.set("n", "<Right>", "<Nop>", { desc = "Disable Right arrow" })
 
+-- ### MOVE LINES MOTIONS ###
+-- Normal mode
+vim.keymap.set('n', '<A-j>', ':m .+1<CR>==', { desc = 'Move line down' })
+vim.keymap.set('n', '<A-k>', ':m .-2<CR>==', { desc = 'Move line up' })
+-- Insert mode
+vim.keymap.set('i', '<A-j>', '<Esc>:m .+1<CR>==gi', { desc = 'Move line down' })
+vim.keymap.set('i', '<A-k>', '<Esc>:m .-2<CR>==gi', { desc = 'Move line up' })
+-- Visual mode
+vim.keymap.set('v', '<A-j>', ":m '>+1<CR>gv=gv", { desc = 'Move selection down' })
+vim.keymap.set('v', '<A-k>', ":m '<-2<CR>gv=gv", { desc = 'Move selection up' })
+
 vim.keymap.set("n", "<Esc>", ":nohlsearch<CR>", { desc = "Clear search highlights" })
 
 -- Copy to system clipboard
