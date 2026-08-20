@@ -1,11 +1,11 @@
 return {
   "pmizio/typescript-tools.nvim",
-  dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig", "hrsh7th/cmp-nvim-lsp" },
+  dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig", "saghen/blink.cmp" },
   lazy = false,
   config = function(_, opts)
     local api = require("typescript-tools.api")
 
-    opts.capabilities = require("cmp_nvim_lsp").default_capabilities()
+    opts.capabilities = require("blink.cmp").get_lsp_capabilities()
     opts.handlers = {
       ["textDocument/publishDiagnostics"] = api.filter_diagnostics({
         80001, -- Ignore this might be converted to a ES export

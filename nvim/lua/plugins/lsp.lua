@@ -2,10 +2,10 @@ return {
 	"neovim/nvim-lspconfig",
 	dependencies = {
 		"williamboman/mason-lspconfig.nvim",
-		"hrsh7th/cmp-nvim-lsp",
+    "saghen/blink.cmp",
 	},
 	config = function()
-		local capabilities = require("cmp_nvim_lsp").default_capabilities()
+    local capabilities = require("blink.cmp").get_lsp_capabilities()
 
 		-- Keybinds that activate when any LSP attaches to a buffer
 		vim.api.nvim_create_autocmd("LspAttach", {
@@ -57,6 +57,14 @@ return {
 		vim.lsp.config("jsonls", { capabilities = capabilities })
 		vim.lsp.config("pyright", { capabilities = capabilities })
 		vim.lsp.config("omnisharp", { capabilities = capabilities })
+    vim.lsp.config("angularls", { capabilities = capabilities })
+		vim.lsp.config("biome", {
+			capabilities = capabilities,
+			root_dir = function(bufnr, on_dir)
+				local root = vim.fs.root(bufnr, { "biome.json", "biome.jsonc", ".git" })
+				on_dir(root)
+			end,
+		})
 		vim.lsp.config("lua_ls", {
 			capabilities = capabilities,
 			settings = {
@@ -70,6 +78,6 @@ return {
 		})
 
 		-- Enable all configured servers
-		vim.lsp.enable({ "cssls", "eslint", "html", "jsonls", "pyright", "omnisharp", "lua_ls" })
+		vim.lsp.enable({ "cssls", "eslint", "html", "jsonls", "pyright", "omnisharp", "angularls", "biome", "lua_ls" })
 	end,
 }

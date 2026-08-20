@@ -4,6 +4,7 @@ return {
   dependencies = {
     "nvim-lua/plenary.nvim",
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+    "nvim-telescope/telescope-live-grep-args.nvim",
   },
   config = function()
     local telescope = require("telescope")
@@ -42,8 +43,9 @@ return {
       },
     })
 
-    -- Load the fzf extension after setup
+    -- Load extensions
     telescope.load_extension("fzf")
+    telescope.load_extension("live_grep_args")
   end,
   keys = {
     {
@@ -56,9 +58,9 @@ return {
     {
       "<leader>tl",
       function()
-        require("telescope.builtin").live_grep()
+        require("telescope").extensions.live_grep_args.live_grep_args()
       end,
-      desc = "Live grep",
+      desc = "Live grep (with args)",
     },
     {
       "<leader>gs",
@@ -77,7 +79,12 @@ return {
     {
       "<leader>tc",
       function()
-        require("telescope.builtin").current_buffer_fuzzy_find()
+        require("telescope.builtin").current_buffer_fuzzy_find({
+          -- sorting_strategy = "ascending",
+          tiebreak = function(a, b, _)
+            return a.lnum < b.lnum
+          end,
+        })
       end,
       desc = "Grep current buffer",
     },

@@ -1,50 +1,25 @@
 return {
-  "hrsh7th/nvim-cmp",
+  "saghen/blink.cmp",
+  version = "1.*",
   dependencies = {
-    "hrsh7th/cmp-nvim-lsp",
-    "hrsh7th/cmp-buffer",
-    "hrsh7th/cmp-path",
     "L3MON4D3/LuaSnip",
-    "saadparwaiz1/cmp_luasnip",
+    "rafamadriz/friendly-snippets",
   },
-  config = function()
-    local cmp = require("cmp")
-    local luasnip = require("luasnip")
-
-    cmp.setup({
-      snippet = {
-        expand = function(args)
-          luasnip.lsp_expand(args.body)
-        end,
-      },
-      mapping = cmp.mapping.preset.insert({
-        ["<C-Space>"] = cmp.mapping.complete(),            -- trigger manually
-        ["<CR>"] = cmp.mapping.confirm({ select = true }), -- confirm with Enter
-        ["<Tab>"] = cmp.mapping(function(fallback)         -- cycle forward
-          if cmp.visible() then
-            cmp.select_next_item()
-          elseif luasnip.expand_or_jumpable() then
-            luasnip.expand_or_jump()
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
-        ["<S-Tab>"] = cmp.mapping(function(fallback) -- cycle backward
-          if cmp.visible() then
-            cmp.select_prev_item()
-          elseif luasnip.jumpable(-1) then
-            luasnip.jump(-1)
-          else
-            fallback()
-          end
-        end, { "i", "s" }),
-      }),
-      sources = cmp.config.sources({
-        { name = "nvim_lsp" },
-        { name = "luasnip" },
-        { name = "buffer" },
-        { name = "path" },
-      }),
-    })
-  end,
+  opts = {
+    snippets = { preset = "luasnip" },
+    keymap = {
+      preset = "none",
+      ["<C-Space>"] = { "show", "fallback" },
+      ["<CR>"] = { "accept", "fallback" },
+      ["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
+      ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
+      ["<C-e>"] = { "cancel", "fallback" },
+    },
+    sources = {
+      default = { "lsp", "snippets", "buffer", "path" },
+    },
+    completion = {
+      documentation = { auto_show = true },
+    },
+  },
 }

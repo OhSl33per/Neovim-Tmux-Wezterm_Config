@@ -3,6 +3,9 @@ vim.cmd("set tabstop=2")
 vim.cmd("set softtabstop=2")
 vim.cmd("set shiftwidth=2")
 
+local currentColorTheme = "github-theme"
+local currentColorScheme = "github_dark_default"
+
 -- Auto-recover swap files silently and delete the swap after recovery
 vim.opt.swapfile = false
 
@@ -52,8 +55,17 @@ require("lazy").setup({
   checker = { enabled = true },
 })
 
+vim.cmd("colorscheme " .. currentColorScheme)
 
-vim.cmd("colorscheme github_dark_default")
+-- Create a custom group for inactive windows (e.g., darker background, dim text)
+local inactiveConfig = {
+  bg = '#242424', -- Darker background
+  fg = '#6c7086', -- Muted text
+  blend = 10,
+}
+vim.api.nvim_set_hl(0, 'CustomInactive', inactiveConfig)
+vim.api.nvim_set_hl(0, 'NeoTreeNormalNC', inactiveConfig)
+vim.opt.winhighlight = 'Normal:Normal,NormalNC:CustomInactive'
 
 vim.api.nvim_set_hl(0, "GitSignsCurrentLineBlame", {
   fg = "#00ff1a",
@@ -109,10 +121,46 @@ vim.keymap.set('i', '<A-k>', '<Esc>:m .-2<CR>==gi', { desc = 'Move line up' })
 vim.keymap.set('v', '<A-j>', ":m '>+1<CR>gv=gv", { desc = 'Move selection down' })
 vim.keymap.set('v', '<A-k>', ":m '<-2<CR>gv=gv", { desc = 'Move selection up' })
 
+-- ### DUPLICATE LINES ###
+-- Normal mode: duplicate line below / above
+vim.keymap.set('n', '<A-S-j>', ':copy .<CR>==', { desc = 'Duplicate line down' })
+vim.keymap.set('n', '<A-S-k>', ':copy .-1<CR>==', { desc = 'Duplicate line up' })
+-- Insert mode
+vim.keymap.set('i', '<A-S-j>', '<Esc>:copy .<CR>==gi', { desc = 'Duplicate line down' })
+vim.keymap.set('i', '<A-S-k>', '<Esc>:copy .-1<CR>==gi', { desc = 'Duplicate line up' })
+-- Visual mode: duplicate selection below / above
+vim.keymap.set('v', '<A-S-j>', ":copy '><CR>gv=gv", { desc = 'Duplicate selection down' })
+vim.keymap.set('v', '<A-S-k>', ":copy '<-1<CR>gv=gv", { desc = 'Duplicate selection up' })
+
 vim.keymap.set("n", "<Esc>", ":nohlsearch<CR>", { desc = "Clear search highlights" })
 
 -- Copy to system clipboard
 vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { desc = "Yank to clipboard" })
+
+-- Copy file info to system clipboard
+vim.keymap.set("n", "<leader>wn", function()
+  local name = vim.fn.expand("%:t")
+  vim.fn.setreg("+", name)
+  vim.notify("Copied filename: " .. name)
+end, { desc = "Copy filename" })
+
+vim.keymap.set("n", "<leader>wp", function()
+  local path = vim.fn.expand("%:p")
+  vim.fn.setreg("+", path)
+  vim.notify("Copied full path: " .. path)
+end, { desc = "Copy full path" })
+
+vim.keymap.set("n", "<leader>wr", function()
+  local path = vim.fn.expand("%:.")
+  vim.fn.setreg("+", path)
+  vim.notify("Copied relative path: " .. path)
+end, { desc = "Copy relative path" })
+
+vim.keymap.set("n", "<leader>wd", function()
+  local dir = vim.fn.expand("%:p:h")
+  vim.fn.setreg("+", dir)
+  vim.notify("Copied directory: " .. dir)
+end, { desc = "Copy file directory" })
 -- Paste from system clipboard
 vim.keymap.set({ "n", "v" }, "<leader>p", '"+p', { desc = "Paste from clipboard" })
 
