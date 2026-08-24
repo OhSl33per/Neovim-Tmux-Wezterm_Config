@@ -96,6 +96,16 @@ return {
       desc = "Grep string under cursor",
     },
     {
+      "<leader>tv",
+      function()
+        vim.cmd('normal! "zy')
+        local selected = vim.fn.getreg("z")
+        require("telescope.builtin").grep_string({ search = selected })
+      end,
+      desc = "Grep visual selection",
+      mode = "v",
+    },
+    {
       "<leader>tb",
       function()
         require("telescope.builtin").buffers()
@@ -123,7 +133,7 @@ return {
       desc = "Find references",
     },
     {
-      "<leader>td",
+      "<leader>tD",
       function()
         require("telescope.builtin").lsp_definitions()
       end,

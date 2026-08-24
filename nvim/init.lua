@@ -3,6 +3,9 @@ vim.cmd("set tabstop=2")
 vim.cmd("set softtabstop=2")
 vim.cmd("set shiftwidth=2")
 
+-- Disable matchparen — scans buffer on every keystroke, causes insert mode lag
+vim.g.loaded_matchparen = 1
+
 -- local currentColorTheme = "github-theme"
 local currentColorScheme = "github_dark_default"
 
@@ -66,6 +69,12 @@ local inactiveConfig = {
 vim.api.nvim_set_hl(0, 'CustomInactive', inactiveConfig)
 vim.api.nvim_set_hl(0, 'NeoTreeNormalNC', inactiveConfig)
 vim.opt.winhighlight = 'Normal:Normal,NormalNC:CustomInactive'
+
+vim.api.nvim_create_autocmd({ "WinNew", "WinEnter" }, {
+  callback = function()
+    vim.wo.winhighlight = 'Normal:Normal,NormalNC:CustomInactive'
+  end,
+})
 
 vim.api.nvim_set_hl(0, "GitSignsCurrentLineBlame", {
   fg = "#00ff1a",
@@ -133,6 +142,14 @@ vim.keymap.set('v', '<A-S-j>', ":copy '><CR>gv=gv", { desc = 'Duplicate selectio
 vim.keymap.set('v', '<A-S-k>', ":copy '<-1<CR>gv=gv", { desc = 'Duplicate selection up' })
 
 vim.keymap.set("n", "<Esc>", ":nohlsearch<CR>", { desc = "Clear search highlights" })
+
+-- Replace selected text across entire buffer
+vim.keymap.set("v", "<leader>rx", function()
+  vim.cmd('normal! "zy')
+  local selected = vim.fn.getreg("z")
+  local replacement = vim.fn.input("Replace with: ")
+  vim.cmd("%s/" .. vim.fn.escape(selected, "/\\") .. "/" .. replacement .. "/g")
+end, { desc = "Replace selection across buffer" })
 
 -- Copy to system clipboard
 vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { desc = "Yank to clipboard" })
@@ -202,37 +219,37 @@ if is_wsl == true then
   }
 end
 
-local function load_grep_matches_to_buffer(pattern, root)
-  root = root or vim.loop.cwd()
-  local handle = io.popen(string.format("rg -w --files-with-matches %q %q", pattern, root))
-  if not handle then
-    vim.notify("Failed to run ripgrep", vim.log.levels.ERROR)
-    return
-  end
-  local result = handle:read("*a")
-  handle:close()
-  local files = {}
-  for file in result:gmatch("[^\r\n]+") do
-    file = vim.fn.fnamemodify(vim.trim(file), ":p") -- ensure absolute path, trim whitespace
-    if vim.fn.filereadable(file) == 1 then
-      local bufnr = vim.fn.bufadd(file)
-      vim.fn.bufload(bufnr)
-      vim.bo[bufnr].buflisted = true -- Make sure buffer is listed!
-      table.insert(files, file)
-    end
-  end
-  if #files == 0 then
-    vim.notify("No files found matching: " .. pattern, vim.log.levels.INFO)
-    return
-  end
-  vim.notify(("Loaded %d files into buffer for pattern: %s"):format(#files, pattern))
-end
-
-vim.api.nvim_create_user_command("LoadGrepBuffers", function(opts)
-  load_grep_matches_to_buffer(opts.args)
-end, { nargs = 1, complete = "file" })
-
-vim.keymap.set("n", "<leader>fw", function()
-  local cword = vim.fn.expand("<cword>")
-  load_grep_matches_to_buffer(cword)
-end, { desc = "Load into buffers all files matching word under cursor" })
+-- local function load_grep_matches_to_buffer(pattern, root)
+--   root = root or vim.loop.cwd()
+--   local handle = io.popen(string.format("rg -w --files-with-matches %q %q", pattern, root))
+--   if not handle then
+--     vim.notify("Failed to run ripgrep", vim.log.levels.ERROR)
+--     return
+--   end
+--   local result = handle:read("*a")
+--   handle:close()
+--   local files = {}
+--   for file in result:gmatch("[^\r\n]+") do
+--     file = vim.fn.fnamemodify(vim.trim(file), ":p") -- ensure absolute path, trim whitespace
+--     if vim.fn.filereadable(file) == 1 then
+--       local bufnr = vim.fn.bufadd(file)
+--       vim.fn.bufload(bufnr)
+--       vim.bo[bufnr].buflisted = true -- Make sure buffer is listed!
+--       table.insert(files, file)
+--     end
+--   end
+--   if #files == 0 then
+--     vim.notify("No files found matching: " .. pattern, vim.log.levels.INFO)
+--     return
+--   end
+--   vim.notify(("Loaded %d files into buffer for pattern: %s"):format(#files, pattern))
+-- end
+--
+-- vim.api.nvim_create_user_command("LoadGrepBuffers", function(opts)
+--   load_grep_matches_to_buffer(opts.args)
+-- end, { nargs = 1, complete = "file" })
+--
+-- vim.keymap.set("n", "<leader>fw", function()
+--   local cword = vim.fn.expand("<cword>")
+--   load_grep_matches_to_buffer(cword)
+-- end, { desc = "Load into buffers all files matching word under cursor" })

@@ -17,6 +17,9 @@ return {
     settings = {
       expose_as_code_action = "all",
       complete_function_calls = false,
+      -- Debounce LSP requests to reduce insert mode lag
+      tsserver_max_memory = "auto",
+      publish_diagnostic_on = "insert_leave", -- only send diagnostics on leaving insert mode
       jsx_close_tag = {
         enable = true,
         filetypes = { "javascriptreact", "typescriptreact" },

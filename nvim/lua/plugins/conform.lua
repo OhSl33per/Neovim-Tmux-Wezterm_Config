@@ -17,6 +17,6 @@ return {
     },
   },
   keys = {
-    { "<leader>cf", vim.lsp.buf.format, desc = "Format document" },
+    { "<leader>cf", function() require("conform").format({ async = true, lsp_fallback = true }) end, desc = "Format document" },
   },
 }
