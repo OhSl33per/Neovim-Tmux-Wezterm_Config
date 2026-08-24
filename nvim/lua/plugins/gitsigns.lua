@@ -36,7 +36,7 @@ return {
       map('n', '<leader>ggs', gitsigns.stage_hunk, { desc = 'git [s]tage hunk' })
       map('n', '<leader>ggr', gitsigns.reset_hunk, { desc = 'git [r]eset hunk' })
       map('n', '<leader>ggS', gitsigns.stage_buffer, { desc = 'git [S]tage buffer' })
-      map('n', '<leader>ggu', gitsigns.stage_hunk, { desc = 'git [u]ndo stage hunk' })
+      map('n', '<leader>ggu', gitsigns.undo_stage_hunk, { desc = 'git [u]ndo stage hunk' })
       map('n', '<leader>ggR', gitsigns.reset_buffer, { desc = 'git [R]eset buffer' })
       map('n', '<leader>ggp', gitsigns.preview_hunk, { desc = 'git [p]review hunk' })
       map('n', '<leader>ggb', gitsigns.blame_line, { desc = 'git [b]lame line' })

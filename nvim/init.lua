@@ -3,13 +3,13 @@ vim.cmd("set tabstop=2")
 vim.cmd("set softtabstop=2")
 vim.cmd("set shiftwidth=2")
 
-local currentColorTheme = "github-theme"
+-- local currentColorTheme = "github-theme"
 local currentColorScheme = "github_dark_default"
 
 -- Auto-recover swap files silently and delete the swap after recovery
 vim.opt.swapfile = false
 
--- enable persistent undo accross sessions
+-- enable persistent undo across sessions
 vim.opt.undofile = true
 
 vim.opt.number = true
@@ -115,8 +115,8 @@ vim.keymap.set("n", "<Right>", "<Nop>", { desc = "Disable Right arrow" })
 vim.keymap.set('n', '<A-j>', ':m .+1<CR>==', { desc = 'Move line down' })
 vim.keymap.set('n', '<A-k>', ':m .-2<CR>==', { desc = 'Move line up' })
 -- Insert mode
-vim.keymap.set('i', '<A-j>', '<Esc>:m .+1<CR>==gi', { desc = 'Move line down' })
-vim.keymap.set('i', '<A-k>', '<Esc>:m .-2<CR>==gi', { desc = 'Move line up' })
+-- vim.keymap.set('i', '<A-j>' , '<Esc>:m .+1<CR>==gi', { desc = 'Move line down' })
+-- vim.keymap.set('i', '<A-k>', '<Esc>:m .-2<CR>==gi', { desc = 'Move line up' })
 -- Visual mode
 vim.keymap.set('v', '<A-j>', ":m '>+1<CR>gv=gv", { desc = 'Move selection down' })
 vim.keymap.set('v', '<A-k>', ":m '<-2<CR>gv=gv", { desc = 'Move selection up' })
@@ -126,8 +126,8 @@ vim.keymap.set('v', '<A-k>', ":m '<-2<CR>gv=gv", { desc = 'Move selection up' })
 vim.keymap.set('n', '<A-S-j>', ':copy .<CR>==', { desc = 'Duplicate line down' })
 vim.keymap.set('n', '<A-S-k>', ':copy .-1<CR>==', { desc = 'Duplicate line up' })
 -- Insert mode
-vim.keymap.set('i', '<A-S-j>', '<Esc>:copy .<CR>==gi', { desc = 'Duplicate line down' })
-vim.keymap.set('i', '<A-S-k>', '<Esc>:copy .-1<CR>==gi', { desc = 'Duplicate line up' })
+-- vim.keymap.set('i', '<A-S-j>', '<Esc>:copy .<CR>==gi', { desc = 'Duplicate line down' })
+-- vim.keymap.set('i', '<A-S-k>', '<Esc>:copy .-1<CR>==gi', { desc = 'Duplicate line up' })
 -- Visual mode: duplicate selection below / above
 vim.keymap.set('v', '<A-S-j>', ":copy '><CR>gv=gv", { desc = 'Duplicate selection down' })
 vim.keymap.set('v', '<A-S-k>', ":copy '<-1<CR>gv=gv", { desc = 'Duplicate selection up' })
@@ -180,11 +180,10 @@ vim.keymap.set("n", "<leader>xc", ":cclose<CR>", { desc = "Close quickfix" })
 
 vim.keymap.set({ "n", "v" }, "<Leader>j", "J", { noremap = true, silent = true, desc = "Join Lines" })
 
-local opts = { noremap = true, silent = true }
-vim.keymap.set({ "n", "v" }, "J", "10j", { desc = "Jump down 10 lines" }, opts)
-vim.keymap.set({ "n", "v" }, "K", "10k", { desc = "Jump up 10 lines" }, opts)
-vim.keymap.set({ "n", "v" }, "H", "10h", { desc = "Jump left 10 chars" }, opts)
-vim.keymap.set({ "n", "v" }, "L", "10l", { desc = "Jump right 10 chars" }, opts)
+vim.keymap.set({ "n", "v" }, "J", "10j", { noremap = true, silent = true, desc = "Jump down 10 lines" })
+vim.keymap.set({ "n", "v" }, "K", "10k", { noremap = true, silent = true, desc = "Jump up 10 lines" })
+vim.keymap.set({ "n", "v" }, "H", "10h", { noremap = true, silent = true, desc = "Jump left 10 chars" })
+vim.keymap.set({ "n", "v" }, "L", "10l", { noremap = true, silent = true, desc = "Jump right 10 chars" })
 
 if is_wsl == true then
   vim.g.clipboard = {

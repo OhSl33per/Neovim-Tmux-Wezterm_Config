@@ -70,7 +70,7 @@ return {
       desc = "Git status (changed files)",
     },
     {
-      "<leader>tr",
+      "<leader>tR",
       function()
         require("telescope.builtin").resume()
       end,
