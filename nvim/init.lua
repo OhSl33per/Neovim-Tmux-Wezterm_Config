@@ -199,6 +199,11 @@ vim.keymap.set({ "n", "v" }, "K", "10k", { noremap = true, silent = true, desc =
 vim.keymap.set({ "n", "v" }, "H", "10h", { noremap = true, silent = true, desc = "Jump left 10 chars" })
 vim.keymap.set({ "n", "v" }, "L", "10l", { noremap = true, silent = true, desc = "Jump right 10 chars" })
 
+vim.keymap.set({"n", "v"}, "<leader>ss", ":w<CR>", { desc = "Save File [format]" })
+vim.keymap.set({"n", "v"}, "<leader>sS", ":noautocmd w<CR>", { desc = "Save File [NO format]" })
+vim.keymap.set({"n", "v"}, "<leader>sq", ":wq<CR>", { desc = "Save File & Quit [format]" })
+vim.keymap.set({"n", "v"}, "<leader>sQ", ":noautocmd wq<CR>", { desc = "Save File & Quit [NO format]" })
+
 if is_wsl == true then
   vim.g.clipboard = {
     name = "WslClipboard",
