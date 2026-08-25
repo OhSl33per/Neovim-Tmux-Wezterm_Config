@@ -3,9 +3,6 @@ vim.cmd("set tabstop=2")
 vim.cmd("set softtabstop=2")
 vim.cmd("set shiftwidth=2")
 
--- Disable matchparen — scans buffer on every keystroke, causes insert mode lag
-vim.g.loaded_matchparen = 1
-
 -- local currentColorTheme = "github-theme"
 local currentColorScheme = "github_dark_default"
 

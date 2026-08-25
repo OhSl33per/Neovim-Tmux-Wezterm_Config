@@ -29,6 +29,10 @@ return {
 
     -- New 0.11+ API: vim.lsp.config instead of lspconfig.server.setup()
     vim.lsp.config("cssls", { capabilities = capabilities })
+    -- Captured before overriding on_attach below, so it references
+    -- nvim-lspconfig's *default* eslint on_attach (which registers the
+    -- LspEslintFixAll command), not our own override.
+    local eslint_base_on_attach = vim.lsp.config.eslint.on_attach
     vim.lsp.config("eslint", {
       capabilities = capabilities,
       settings = {
@@ -53,6 +57,20 @@ return {
         })
         on_dir(root)
       end,
+      -- `format = false` above (needed to stop the ESLint LSP causing
+      -- insert-mode lag) also disables the "format-as-fixAll" behavior that
+      -- used to auto-sort imports. Restore auto-fixing (incl. import/order)
+      -- on save via the dedicated `LspEslintFixAll` command instead, which
+      -- calls eslint.applyAllFixes directly and is unaffected by `format`.
+      on_attach = function(client, bufnr)
+        if eslint_base_on_attach then
+          eslint_base_on_attach(client, bufnr)
+        end
+        vim.api.nvim_create_autocmd("BufWritePre", {
+          buffer = bufnr,
+          command = "LspEslintFixAll",
+        })
+      end,
     })
     vim.lsp.config("html", { capabilities = capabilities })
     vim.lsp.config("jsonls", { capabilities = capabilities })
@@ -62,8 +80,14 @@ return {
     vim.lsp.config("biome", {
       capabilities = capabilities,
       root_dir = function(bufnr, on_dir)
-        local root = vim.fs.root(bufnr, { "biome.json", "biome.jsonc", ".git" })
-        on_dir(root)
+        -- Only attach Biome when the project actually opts into it via a
+        -- biome.json(c) config. Falling back to .git would attach Biome to
+        -- every JS/TS project (even ESLint-only ones like FlickFix) and its
+        -- default import-sort order conflicts with tsserver/ESLint's.
+        local root = vim.fs.root(bufnr, { "biome.json", "biome.jsonc" })
+        if root then
+          on_dir(root)
+        end
       end,
     })
     vim.lsp.config("lua_ls", {
