@@ -56,18 +56,65 @@ return {
       desc = "Find files",
     },
     {
-      "<leader>tl",
+      "<leader>tL",
       function()
         require("telescope").extensions.live_grep_args.live_grep_args()
       end,
       desc = "Live grep (with args)",
     },
     {
-      "<leader>gs",
+      "<leader>tl",
       function()
-        require("telescope.builtin").git_status()
+        require("telescope.builtin").live_grep({
+          prompt_title = "Live grep (w/ ignore)",
+          file_ignore_patterns = {
+            -- Directories
+            "node_modules/",
+            "%.git/",
+            "dist/",
+            "build/",
+            "coverage/",
+            "%.turbo/",
+            "%.next/",
+            "__tests__/",
+            "api-reference/",
+            "drizzle",
+
+            -- Image and media files
+            "%.png$",
+            "%.jpg$",
+            "%.jpeg$",
+            "%.gif$",
+            "%.svg$",
+            "%.webp$",
+            "%.ico$",
+
+            -- JS/MJS compiled outputs and sourcemaps
+            "%.js$",
+            "%.mjs$",
+            "%.cjs$",
+            "%.js%.map$",
+
+            -- Test and spec files
+            "%.test%.",
+            "%.spec%.",
+
+            -- ReadMe files
+            "%.md",
+          },
+        })
       end,
-      desc = "Git status (changed files)",
+      desc = "Live grep w/ ignore",
+    },
+    {
+      "<leader>ta",
+      function()
+        require("telescope.builtin").live_grep({
+          prompt_title = "Live grep (ALL)"
+
+        })
+      end,
+      desc = "Live grep ALL",
     },
     {
       "<leader>tR",
@@ -152,6 +199,23 @@ return {
         require("telescope.builtin").diagnostics()
       end,
       desc = "List diagnostics on current buffer",
+    },
+    -- GIT interactions w/ telescope
+    {
+      "<leader>gss",
+      function()
+        require("telescope.builtin").git_status()
+      end,
+      desc = "Git status (changed files)",
+    },
+    {
+      "<leader>gsc",
+      function()
+        require("telescope.builtin").git_status({
+          default_text = vim.fn.expand("%:t"),
+        })
+      end,
+      desc = "Git status (changes in current file)",
     },
   },
 }

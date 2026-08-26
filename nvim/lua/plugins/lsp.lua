@@ -3,6 +3,17 @@ return {
   dependencies = {
     "williamboman/mason-lspconfig.nvim",
     "saghen/blink.cmp",
+    -- Add this dependency to provide the Neovim API signatures
+    {
+      "folke/lazydev.nvim",
+      ft = "lua",
+      opts = {
+        library = {
+          -- Load luvit types when the `vim.uv` word is found
+          { path = "${3rd}/luvit/library", words = { "vim%.uv" } },
+        },
+      },
+    },
   },
   config = function()
     local capabilities = require("blink.cmp").get_lsp_capabilities()
@@ -29,22 +40,15 @@ return {
 
     -- New 0.11+ API: vim.lsp.config instead of lspconfig.server.setup()
     vim.lsp.config("cssls", { capabilities = capabilities })
-    -- Captured before overriding on_attach below, so it references
-    -- nvim-lspconfig's *default* eslint on_attach (which registers the
-    -- LspEslintFixAll command), not our own override.
+
     local eslint_base_on_attach = vim.lsp.config.eslint.on_attach
     vim.lsp.config("eslint", {
       capabilities = capabilities,
       settings = {
-        -- Ensure onIgnoredFiles is explicitly set so ESLint doesn't silently discard buffers
         onIgnoredFiles = "off",
         run = "onType",
         format = false,
       },
-      -- nvim-lspconfig's default root_dir resolves via package-lock.json/yarn.lock,
-      -- which stops at client/'s own lockfile and never reaches the repo-root
-      -- eslint.config.mts. Override it to walk up for the flat config (or .git)
-      -- directly, so client/ and server/ both resolve to the true repo root.
       root_dir = function(bufnr, on_dir)
         local root = vim.fs.root(bufnr, {
           "eslint.config.js",
@@ -57,11 +61,6 @@ return {
         })
         on_dir(root)
       end,
-      -- `format = false` above (needed to stop the ESLint LSP causing
-      -- insert-mode lag) also disables the "format-as-fixAll" behavior that
-      -- used to auto-sort imports. Restore auto-fixing (incl. import/order)
-      -- on save via the dedicated `LspEslintFixAll` command instead, which
-      -- calls eslint.applyAllFixes directly and is unaffected by `format`.
       on_attach = function(client, bufnr)
         if eslint_base_on_attach then
           eslint_base_on_attach(client, bufnr)
@@ -72,31 +71,35 @@ return {
         })
       end,
     })
+
     vim.lsp.config("html", { capabilities = capabilities })
     vim.lsp.config("jsonls", { capabilities = capabilities })
     vim.lsp.config("pyright", { capabilities = capabilities })
     vim.lsp.config("omnisharp", { capabilities = capabilities })
     vim.lsp.config("angularls", { capabilities = capabilities })
+
     vim.lsp.config("biome", {
       capabilities = capabilities,
       root_dir = function(bufnr, on_dir)
-        -- Only attach Biome when the project actually opts into it via a
-        -- biome.json(c) config. Falling back to .git would attach Biome to
-        -- every JS/TS project (even ESLint-only ones like FlickFix) and its
-        -- default import-sort order conflicts with tsserver/ESLint's.
         local root = vim.fs.root(bufnr, { "biome.json", "biome.jsonc" })
         if root then
           on_dir(root)
         end
       end,
     })
+
+    -- Updated lua_ls configuration
     vim.lsp.config("lua_ls", {
       capabilities = capabilities,
       settings = {
         Lua = {
           diagnostics = {
-            -- Prevent lua_ls flagging 'vim' as an undefined global
+            -- Kept for safety, though lazydev handles this automatically
             globals = { "vim" },
+          },
+          workspace = {
+            -- Prevents "Do you want to configure your work environment?" popups
+            checkThirdParty = false,
           },
         },
       },

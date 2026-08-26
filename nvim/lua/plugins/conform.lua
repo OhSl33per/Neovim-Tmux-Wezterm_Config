@@ -18,5 +18,6 @@ return {
   },
   keys = {
     { "<leader>cf", function() require("conform").format({ async = true, lsp_fallback = true }) end, desc = "Format document" },
+    { "<leader>cf", function() require("conform").format({ async = true, lsp_fallback = true }) end, desc = "Format selection", mode = "v" },
   },
 }
