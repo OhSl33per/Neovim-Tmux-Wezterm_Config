@@ -104,7 +104,7 @@ vim.o.guicursor = "n-v-c-sm:block-blinkwait700-blinkoff400-blinkon250,"
 vim.o.cursorline = true
 -- vim.api.nvim_set_hl(0, "CursorLine", { bg = "#171717"})
 vim.o.cursorlineopt = 'number'
-vim.api.nvim_set_hl(0, 'CursorLineNr', { bg = "#ff1500" })
+vim.api.nvim_set_hl(0, 'CursorLineNr', { bg = "#00ff1a", fg="#000000" })
 
 -- local cursorline_group = vim.api.nvim_create_augroup("DynamicCursorLine", { clear = true })
 
@@ -200,7 +200,7 @@ end, { desc = "Replace selection across buffer" })
 -- Copy to system clipboard
 vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { desc = "Yank to clipboard" })
 -- Copy buffer to system clipboard
-vim.keymap.set({ "n", "v" }, "<leader>qc", ':%y+', { desc = "Yank Entire Buffer" })
+vim.keymap.set({ "n", "v" }, "<leader>qc", ':%y+<CR>', { desc = "Yank Entire Buffer" })
 
 -- Copy file info to system clipboard
 vim.keymap.set("n", "<leader>wn", function()

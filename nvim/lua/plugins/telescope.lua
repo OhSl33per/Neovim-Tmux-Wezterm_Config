@@ -167,6 +167,7 @@ return {
             "class",
             "function",
             "method",
+            "var",
           },
         })
       end,
