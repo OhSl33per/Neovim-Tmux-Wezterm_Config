@@ -104,7 +104,7 @@ vim.o.guicursor = "n-v-c-sm:block-blinkwait700-blinkoff400-blinkon250,"
 vim.o.cursorline = true
 -- vim.api.nvim_set_hl(0, "CursorLine", { bg = "#171717"})
 vim.o.cursorlineopt = 'number'
-vim.api.nvim_set_hl(0, 'CursorLineNr', { bg = "#00ff1a", fg="#000000" })
+vim.api.nvim_set_hl(0, 'CursorLineNr', { bg = "#00ff1a", fg = "#000000" })
 
 -- local cursorline_group = vim.api.nvim_create_augroup("DynamicCursorLine", { clear = true })
 
@@ -158,8 +158,8 @@ vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
 
 -- ### DUPLICATE LINES ###
 -- Normal mode: duplicate line below / above
-vim.keymap.set("n", "<A-S-j>", ":copy .<CR>==", { desc = "Duplicate line down" })
-vim.keymap.set("n", "<A-S-k>", ":copy .-1<CR>==", { desc = "Duplicate line up" })
+vim.keymap.set("n", "gj", ":copy .<CR>==", { desc = "Duplicate line down" })
+vim.keymap.set("n", "gk", ":copy .-1<CR>==", { desc = "Duplicate line up" })
 -- Insert mode
 -- vim.keymap.set('i', '<A-S-j>', '<Esc>:copy .<CR>==gi', { desc = 'Duplicate line down' })
 -- vim.keymap.set('i', '<A-S-k>', '<Esc>:copy .-1<CR>==gi', { desc = 'Duplicate line up' })
@@ -236,9 +236,9 @@ vim.o.foldenable = true
 
 vim.opt.diffopt:append({
   "algorithm:histogram", -- Improves diff accuracy
-  "indent-heuristic",   -- Keeps code context aligned
-  "vertical",           -- Forces vertical splits
-  "linematch:60",       -- Better line-by-line alignment
+  "indent-heuristic",    -- Keeps code context aligned
+  "vertical",            -- Forces vertical splits
+  "linematch:60",        -- Better line-by-line alignment
 })
 
 vim.keymap.set("n", "<leader>xc", ":cclose<CR>", { desc = "Close quickfix" })
