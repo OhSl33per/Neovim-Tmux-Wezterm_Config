@@ -22,6 +22,11 @@ return {
             ["<C-k>"] = actions.move_selection_previous,
           },
         },
+        layout_config = {
+          horizontal = {
+            prompt_position = 'top'
+          }
+        }
       },
       extensions = {
         fzf = {
@@ -217,6 +222,41 @@ return {
         })
       end,
       desc = "Git status (changes in current file)",
+    },
+    {
+      "<leader>gD",
+      function()
+        vim.ui.input({ prompt = "Diff against branch: " }, function(branch)
+          if not branch or branch == "" then return end
+
+          local previewers = require("telescope.previewers")
+          local pickers = require("telescope.pickers")
+          local finders = require("telescope.finders")
+          local conf = require("telescope.config").values
+
+          local files = vim.fn.systemlist("git diff --name-only " .. branch)
+          if vim.v.shell_error ~= 0 or #files == 0 then
+            vim.notify("No diff found against: " .. branch, vim.log.levels.WARN)
+            return
+          end
+
+          pickers.new({}, {
+            prompt_title = "Diff vs " .. branch,
+            finder = finders.new_table({ results = files }),
+            sorter = conf.generic_sorter({}),
+            sorting_strategy = "ascending",
+            previewer = previewers.new_buffer_previewer({
+              title = "Diff Preview",
+              define_preview = function(self, entry)
+                local diff = vim.fn.systemlist("git diff " .. branch .. " -- " .. entry.value)
+                vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, diff)
+                vim.api.nvim_buf_set_option(self.state.bufnr, "filetype", "diff")
+              end,
+            }),
+          }):find()
+        end)
+      end,
+      desc = "Git diff against branch (pick files)",
     },
   },
 }

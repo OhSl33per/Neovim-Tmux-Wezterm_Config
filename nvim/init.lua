@@ -232,10 +232,16 @@ end, { desc = "Copy file directory" })
 -- Paste from system clipboard
 vim.keymap.set({ "n", "v" }, "<leader>p", '"+p', { desc = "Paste from clipboard" })
 
-vim.o.foldcolumn = "1"
+vim.o.foldcolumn = "0" -- statuscol.nvim renders the fold column via builtin.foldfunc
 vim.o.foldlevel = 99
 vim.o.foldlevelstart = 99
 vim.o.foldenable = true
+
+vim.opt.fillchars:append({
+  foldopen  = "⌄",
+  foldclose = "›",
+  foldsep   = "│",
+})
 
 vim.opt.diffopt:append({
   "algorithm:histogram", -- Improves diff accuracy
