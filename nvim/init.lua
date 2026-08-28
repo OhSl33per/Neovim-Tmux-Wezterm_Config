@@ -200,7 +200,10 @@ end, { desc = "Replace selection across buffer" })
 -- Copy to system clipboard
 vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { desc = "Yank to clipboard" })
 -- Copy buffer to system clipboard
-vim.keymap.set({ "n", "v" }, "<leader>qc", ':%y+<CR>', { desc = "Yank Entire Buffer" })
+vim.keymap.set({ "n", "v" }, "<leader>qc", function()
+  vim.cmd("%y+")
+  vim.notify("Buffer copied to clipboard", vim.log.levels.INFO)
+end, { desc = "Yank Entire Buffer" })
 
 -- Copy file info to system clipboard
 vim.keymap.set("n", "<leader>wn", function()
