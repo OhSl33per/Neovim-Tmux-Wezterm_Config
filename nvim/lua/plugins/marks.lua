@@ -39,6 +39,9 @@ return {
       -- ... up to bookmark_9
       mappings = {
         annotate = "<leader>ma",
+        delete = "<leader>md",
+        delete_buf = "<leader>mD",
+        preview = "<leader>mp",
       },
     })
 

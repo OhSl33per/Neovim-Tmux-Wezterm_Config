@@ -24,9 +24,14 @@ return {
         },
         layout_config = {
           horizontal = {
-            prompt_position = 'top'
+            prompt_position = 'top',
+            width = 0.99,
+            height = 0.99,
+            results_width = 0.3,
+            preview_width = 0.7,
           }
-        }
+        },
+        sorting_strategy = "ascending",
       },
       extensions = {
         fzf = {
@@ -177,6 +182,19 @@ return {
         })
       end,
       desc = "List Doc Symbols",
+    },
+    {
+      "<leader>tF",
+      function()
+        require("telescope.builtin").treesitter({
+          symbols = {
+            "class",
+            "function",
+            "method",
+          },
+        })
+      end,
+      desc = "List Doc Symbols [no vars]",
     },
     {
       "<leader>tr",
