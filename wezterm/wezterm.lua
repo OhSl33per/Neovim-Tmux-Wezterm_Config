@@ -1,12 +1,12 @@
-local wezterm = require("wezterm")
-local config = wezterm.config_builder()
+local wezterm    = require("wezterm")
+local config     = wezterm.config_builder()
 
 local is_windows = wezterm.target_triple:find("windows") ~= nil
 local is_mac     = wezterm.target_triple:find("darwin") ~= nil
 local is_linux   = wezterm.target_triple:find("linux") ~= nil
 
 -- Check if WezTerm itself is running inside WSL or launching WSL
-local is_wsl = false
+local is_wsl     = false
 
 -- Way A: Check if wezterm is executing under Linux kernel with Microsoft/WSL headers
 if is_linux then
@@ -29,7 +29,7 @@ if is_windows then
   end
 
   if has_wsl then
-    config.default_prog = { "wsl.exe", "bash", "-c", "cd ~ && tmux new-session" }
+    config.default_prog = { "wsl.exe", "zsh", "-c", "cd ~ && tmux new-session" }
   end
 end
 
@@ -42,8 +42,17 @@ print(is_windows)
 -- Appearance
 config.color_scheme = "cyberpunk"
 config.colors = {
-	background = "#000000",
+  background = "#000000",
+  -- cursor_bg = "#ffffff",
+  -- cursor_fg = "#000000",
 }
+
+config.cursor_blink_ease_in = 'Constant'
+config.cursor_blink_ease_out = 'Constant'
+
+config.force_reverse_video_cursor = true
+config.default_cursor_style = 'BlinkingBlock'
+config.cursor_blink_rate = 100
 config.font = wezterm.font("FiraCode Nerd Font")
 config.font_size = 12.0
 config.hide_tab_bar_if_only_one_tab = true

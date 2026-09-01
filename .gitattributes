@@ -1,0 +1,10 @@
+# Normalize line endings to LF for all text files, regardless of platform.
+# This repo (nvim/tmux/wezterm dotfiles) is authored with LF; without this,
+# Windows checkouts with core.autocrlf=true will rewrite files to CRLF and
+# show spurious diffs (and risk committing CRLF back if ever staged).
+* text=auto eol=lf
+
+*.sh text eol=lf
+*.tmux text eol=lf
+*.lua text eol=lf
+*.exp text eol=lf

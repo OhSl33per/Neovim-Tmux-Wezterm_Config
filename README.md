@@ -1,6 +1,6 @@
 # .config
 
-Personal dotfiles repository for `~/.config` on this WSL (Ubuntu 24.04) machine.
+Personal dotfiles repository for `~/.config` for both Windows w/ WSL & Mac; pieces are in place to configure standalone Windows & Linux, but nothing yet implemented.
 
 ## Tracked contents
 
